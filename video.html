@@ -107,7 +107,7 @@ upload.addEventListener("change",()=>{
   preview.appendChild(media);
 });
 
-document.getElementById("generate").addEventListener("click",()=>{
+document.getElementById("generate").addEventListener("click",async ()=>{
   const prompt=document.getElementById("prompt").value.trim();
   const file=upload.files[0];
 
@@ -124,8 +124,28 @@ document.getElementById("generate").addEventListener("click",()=>{
     return;
   }
 
-  statusText.textContent=
-    "Video preview is ready. AI generation is not connected yet.";
+  statusText.textContent="Connecting to AI video generator...";
+   try {
+  const response = await fetch("/.netlify/functions/generate-video", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      prompt,
+      duration: document.getElementById("duration").value,
+      format: document.getElementById("format").value
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Video generation failed");
+  }
+
+  statusText.textContent = data.message || "Video request submitted.";
+} catch (error) {
+  statusText.textContent = error.message;
+} 
 });
 </script>
 </body>
