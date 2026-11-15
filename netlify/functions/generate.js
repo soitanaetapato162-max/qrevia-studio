@@ -76,7 +76,7 @@ Create the requested social media content.`
    console.error("Generation failed:", error); 
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message || "Something went wrong."});
+      body: JSON.stringify({ error: error.message || "Something went wrong." })
     };
   }
 };
