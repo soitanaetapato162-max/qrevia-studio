@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Image Generator | QREVIA Studio</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090914;color:#fff;font-family:Arial,sans-serif}
+header{padding:24px;background:#141426;font-size:25px;font-weight:bold}
+header span{color:#a78bfa}
+main{max-width:760px;margin:auto;padding:28px 20px}
+a{color:#bba5ff}
+h1{font-size:32px;margin-top:35px}
+p{color:#aaaac0;line-height:1.6}
+.panel{background:#19192f;border:1px solid #383858;border-radius:20px;padding:22px;margin-top:30px}
+label{display:block;margin:18px 0 10px}
+textarea,select{width:100%;padding:15px;background:#101020;color:white;border:1px solid #454560;border-radius:12px;font-size:16px}
+textarea{height:145px;resize:vertical}
+button{width:100%;padding:17px;background:#8b5cf6;color:white;border:0;border-radius:12px;font-size:17px;font-weight:bold;margin-top:22px;cursor:pointer}
+button:disabled{opacity:.6}
+img{width:100%;border-radius:14px;margin-top:20px}
+#result{margin-top:25px}
+</style>
+</head>
+<body>
+<header>QREVIA<span>.</span> STUDIO</header>
+<main>
+<a href="/">← Back to creator workspace</a>
+<h1>✦ AI Image Generator</h1>
+<p>Turn your imagination into images with AI. Describe what you want to create.</p>
+<div class="panel">
+<label for="prompt">Describe your image</label>
+<textarea id="prompt" placeholder="Example: A majestic lion wearing a golden crown, cinematic lighting, realistic details"></textarea>
+<label for="size">Image size</label>
+<select id="size">
+<option value="1024x1024">Square</option>
+<option value="1536x1024">Landscape</option>
+<option value="1024x1536">Portrait</option>
+</select>
+<button id="generate" onclick="generateImage()">✦ Generate Image</button>
+<p id="status" role="status"></p>
+<div id="result"></div>
+</div>
+</main>
+<script>
+async function generateImage(){
+const prompt=document.getElementById("prompt").value.trim();
+const size=document.getElementById("size").value;
+const button=document.getElementById("generate");
+const status=document.getElementById("status");
+const result=document.getElementById("result");
+if(!prompt){status.textContent="Please describe your image.";return;}
+button.disabled=true;
+status.textContent="Generating your image...";
+result.innerHTML="";
+try{
+const response=await fetch("/.netlify/functions/generate-image",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({prompt,size})
+});
+const data=await response.json();
+if(!response.ok)throw new Error(data.error||"Generation failed");
+if(!data.image)throw new Error("No image returned");
+const img=document.createElement("img");
+img.src=data.image;
+img.alt="AI generated image";
+result.appendChild(img);
+const link=document.createElement("a");
+link.href=data.image;
+link.download="qrevia-image.png";
+link.textContent="Download Image";
+link.style.display="block";
+link.style.marginTop="16px";
+result.appendChild(link);
+status.textContent="Image generated successfully!";
+}catch(error){
+status.textContent=error.message||"Please try again.";
+}finally{
+button.disabled=false;
+}
+}
+</script>
+</body>
+</html>
