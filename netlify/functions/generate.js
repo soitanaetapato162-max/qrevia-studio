@@ -73,6 +73,7 @@ Create the requested social media content.`
       })
     };
   } catch (error) {
+   console.error("Generation failed:", error); 
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Something went wrong." })
