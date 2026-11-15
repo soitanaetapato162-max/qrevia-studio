@@ -45,6 +45,20 @@ exports.handler = async (event) => {
 
     const data = await response.json();
 
+if (response.ok && data.name) {
+  const check = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/${data.name}`,
+    { headers: { "x-goog-api-key": apiKey } }
+  );
+  const result = await check.json();
+  if (check.ok && result.done) {
+    return {
+      statusCode: 200,
+      body: JSON.stringify(result)
+    };
+  }
+}
+
     return {
       statusCode: response.status,
       headers: { "Content-Type": "application/json" },
