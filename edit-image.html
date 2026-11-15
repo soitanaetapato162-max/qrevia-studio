@@ -1,0 +1,221 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QREVIA Studio | AI Photo Editor</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#0d1020;
+  color:white;
+  font-family:Arial,sans-serif;
+}
+header{
+  padding:24px 18px;
+  text-align:center;
+  background:#17142d;
+}
+h1{margin:0;color:#c6a7ff}
+main{
+  max-width:620px;
+  margin:25px auto;
+  padding:20px;
+}
+.panel{
+  background:#1d2035;
+  padding:22px;
+  border-radius:18px;
+}
+label{
+  display:block;
+  margin:18px 0 9px;
+  font-weight:bold;
+}
+input,textarea{
+  width:100%;
+  padding:14px;
+  border:1px solid #565573;
+  border-radius:10px;
+  background:#111426;
+  color:white;
+  font-size:16px;
+}
+textarea{
+  min-height:115px;
+  resize:vertical;
+}
+button{
+  width:100%;
+  margin-top:20px;
+  padding:16px;
+  background:#8654ee;
+  color:white;
+  border:0;
+  border-radius:12px;
+  font-size:17px;
+  font-weight:bold;
+  cursor:pointer;
+}
+button:disabled{opacity:.6}
+img{
+  display:block;
+  width:100%;
+  max-width:100%;
+  margin-top:18px;
+  border-radius:12px;
+}
+a{color:#c6a7ff}
+#status{
+  margin-top:15px;
+  overflow-wrap:anywhere;
+}
+.download{
+  display:block;
+  text-align:center;
+  margin-top:18px;
+  padding:14px;
+  background:#303751;
+  border-radius:10px;
+}
+small{color:#c4c4d5}
+</style>
+</head>
+<body>
+<header>
+  <h1>QREVIA Studio</h1>
+  <p>AI Photo Editor</p>
+</header>
+
+<main>
+<div class="panel">
+  <h2>Edit Your Photo With AI</h2>
+  <p>Upload a photo and describe what you want to change.</p>
+
+  <label for="photo">Upload your photo</label>
+  <input id="photo" type="file"
+    accept="image/png,image/jpeg,image/webp">
+  <small>PNG, JPG or WebP. Maximum 3 MB.</small>
+
+  <img id="preview" alt="Your uploaded photo"
+    style="display:none">
+
+  <label for="prompt">What should AI change?</label>
+  <textarea id="prompt"
+    placeholder="Example: Change the background to a beautiful beach at sunset. Keep my face unchanged."></textarea>
+
+  <button id="editBtn" onclick="editPhoto()">
+    Edit Photo With AI
+  </button>
+
+  <p id="status" role="status"></p>
+
+  <img id="result" alt="AI edited photo"
+    style="display:none">
+
+  <a id="download" class="download"
+    style="display:none"
+    download="qrevia-edited-photo.png">
+    Download Edited Photo
+  </a>
+
+  <p style="text-align:center">
+    <a href="image.html">AI Image Generator</a>
+  </p>
+</div>
+</main>
+
+<script>
+const photo = document.getElementById("photo");
+const preview = document.getElementById("preview");
+const result = document.getElementById("result");
+const download = document.getElementById("download");
+const statusText = document.getElementById("status");
+const editBtn = document.getElementById("editBtn");
+
+photo.addEventListener("change", () => {
+  result.style.display = "none";
+  download.style.display = "none";
+  statusText.textContent = "";
+
+  const file = photo.files[0];
+  if (!file) {
+    preview.style.display = "none";
+    return;
+  }
+
+  if (!["image/png","image/jpeg","image/webp"]
+      .includes(file.type)) {
+    statusText.textContent = "Choose a JPG, PNG or WebP photo.";
+    photo.value = "";
+    return;
+  }
+
+  if (file.size > 3 * 1024 * 1024) {
+    statusText.textContent = "Photo must be under 3 MB.";
+    photo.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    preview.src = reader.result;
+    preview.style.display = "block";
+  };
+  reader.readAsDataURL(file);
+});
+
+async function editPhoto() {
+  const file = photo.files[0];
+  const prompt = document.getElementById("prompt").value.trim();
+
+  if (!file || !prompt) {
+    statusText.textContent =
+      "Upload a photo and describe your changes.";
+    return;
+  }
+
+  editBtn.disabled = true;
+  statusText.textContent = "AI is editing your photo...";
+  result.style.display = "none";
+  download.style.display = "none";
+
+  try {
+    const image = await new Promise((resolve,reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    const response = await fetch(
+      "/.netlify/functions/edit-image",
+      {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({image,prompt})
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.image) {
+      throw new Error(data.error || "Photo editing failed.");
+    }
+
+    result.src = data.image;
+    result.style.display = "block";
+    download.href = data.image;
+    download.style.display = "block";
+    statusText.textContent = "Photo edited successfully!";
+  } catch (error) {
+    statusText.textContent = "Error: " + error.message;
+  } finally {
+    editBtn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
