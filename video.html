@@ -157,7 +157,7 @@ if (data.id && !data.videoUrl) {
       if (!res.ok) throw new Error(result.error || "Video check failed");
 
       if (result.videoUrl) {
-        statusText.textContent = "Video ready!";
+       statusText.textContent = "Video URL: " + result.videoUrl;
         const video = document.createElement("video");
         video.src = result.videoUrl;
         video.controls = true;
