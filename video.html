@@ -142,7 +142,40 @@ document.getElementById("generate").addEventListener("click",async ()=>{
     throw new Error(data.error || "Video generation failed");
   }
 
-  statusText.textContent = data.message || "Video request submitted.";
+ statusText.textContent = data.message || "Video is processing";
+
+if (data.id && !data.videoUrl) {
+  const videoId = data.id;
+
+  const checkVideo = async () => {
+    try {
+      const res = await fetch(
+        "/.netlify/functions/generate-video?id=" + encodeURIComponent(videoId)
+      );
+      const result = await res.json();
+
+      if (!res.ok) throw new Error(result.error || "Video check failed");
+
+      if (result.videoUrl) {
+        statusText.textContent = "Video ready!";
+        const video = document.createElement("video");
+        video.src = result.videoUrl;
+        video.controls = true;
+        video.style.width = "100%";
+        statusText.after(video);
+      } else if (result.status === "failed") {
+        statusText.textContent = "Video generation failed";
+      } else {
+        statusText.textContent = result.message || "Video is processing";
+        setTimeout(checkVideo, 5000);
+      }
+    } catch (error) {
+      statusText.textContent = error.message;
+    }
+  };
+
+  setTimeout(checkVideo, 5000);
+}  
 } catch (error) {
   statusText.textContent = error.message;
 } 
