@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QREVIA Studio | Login</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090e1b;color:white;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh;padding:20px}
+.card{background:#141d30;padding:30px;border-radius:20px;width:100%;max-width:400px}
+h1{text-align:center;color:#9b8cff}
+p{text-align:center;color:#aab4ca}
+input,button{width:100%;padding:15px;margin:9px 0;border-radius:10px;font-size:16px}
+input{background:#0b1222;border:1px solid #35405a;color:white}
+button{background:#8066ff;color:white;border:0;font-weight:bold;cursor:pointer}
+.link{color:#b8aaff;cursor:pointer;text-align:center;margin-top:18px}
+#message{text-align:center;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>✦ QREVIA Studio</h1>
+<p id="heading">Welcome back</p>
+<input id="email" type="email" placeholder="Email address" autocomplete="email">
+<input id="password" type="password" placeholder="Password" autocomplete="current-password">
+<button id="submit" onclick="authenticate()">Log In</button>
+<div id="message" role="status"></div>
+<div class="link" onclick="switchMode()" id="switch">Create an account</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://slccqlpnidvkpjjjwnit.supabase.co";
+const SUPABASE_KEY = "sb_publishable_E08YJQlfCan8kpSgLohwDg_A0zDJzOy;
+const db = supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let signup = false;
+
+function switchMode(){
+ signup = !signup;
+ document.getElementById("heading").textContent =
+ signup ? "Create your account" : "Welcome back";
+ document.getElementById("submit").textContent =
+ signup ? "Sign Up" : "Log In";
+ document.getElementById("switch").textContent =
+ signup ? "Already have an account? Log in" : "Create an account";
+ document.getElementById("message").textContent = "";
+}
+
+async function authenticate(){
+ const email=document.getElementById("email").value.trim();
+ const password=document.getElementById("password").value;
+ const msg=document.getElementById("message");
+ const btn=document.getElementById("submit");
+ if(!email || !password){
+  msg.textContent="Enter your email and password.";
+  return;
+ }
+ btn.disabled=true;
+ msg.textContent="Please wait...";
+ try{
+  const {data,error}=signup
+   ? await db.auth.signUp({email,password})
+   : await db.auth.signInWithPassword({email,password});
+  if(error) throw error;
+  if(signup){
+   msg.textContent=data.session
+    ? "Account created! You can now log in."
+    : "Check your email to confirm your account.";
+  }else{
+   window.location.href="/index.html";
+  }
+ }catch(e){
+  msg.textContent=e.message || "Something went wrong.";
+ }finally{
+  btn.disabled=false;
+ }
+}
+</script>
+</body>
+</html>
