@@ -164,7 +164,10 @@ if (data.id && !data.videoUrl) {
         video.style.width = "100%";
         statusText.after(video);
       } else if (result.status === "failed") {
-        statusText.textContent = "Video generation failed";
+       
+statusText.textContent = "Video failed. Google response: " + JSON.stringify(result).slice(0, 1000);
+
+
       } else {
         statusText.textContent = result.message || "Video is processing";
         setTimeout(checkVideo, 5000);
