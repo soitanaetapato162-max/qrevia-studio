@@ -92,9 +92,8 @@ console.log("GOOGLE VIDEO RESPONSE:", JSON.stringify(data));
       operation: data.id,
       status: data.status || "in_progress",
       videoUrl: video?.uri || null,
-      message: video?.uri
-        ? "Video URL received"
-        : "Video is processing"
+     message: video?.uri ? "Video URL received" : "No video URL. Google status: " + (data.status || "unknown") + ". Response: " + JSON.stringify(data).slice(0, 500)
+        
     });
   } catch (error) {
     return reply(500, {
