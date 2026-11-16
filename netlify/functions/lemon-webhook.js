@@ -6,7 +6,7 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: "Method not allowed" };
   }
 
-  const secret = process.env.LEMON_WEBHOOK_SECRET;
+const secret = process.env.LEMON_SQUEEZY_WEBHOOK_SECRET;
   if (!secret) {
     return { statusCode: 500, body: "Webhook not configured" };
   }
