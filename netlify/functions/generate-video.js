@@ -75,6 +75,7 @@ exports.handler = async (event) => {
 
     const response = await fetch(url, options);
     const data = await response.json();
+console.log("GOOGLE VIDEO RESPONSE:", JSON.stringify(data));
 
     if (!response.ok) {
       return reply(response.status, {
