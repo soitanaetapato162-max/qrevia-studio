@@ -92,7 +92,7 @@ exports.handler = async (event) => {
       status: data.status || "in_progress",
       videoUrl: video?.uri || null,
       message: video?.uri
-        ? "Video ready"
+        ? "Video URL received"
         : "Video is processing"
     });
   } catch (error) {
