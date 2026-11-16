@@ -25,4 +25,82 @@ function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show')
 $('#language').addEventListener('change',()=>{$('#customLanguage').style.display=$('#language').value.startsWith('Other')?'block':'none'});
 $('#generate').addEventListener('click',async()=>{const topic=$('#topic').value.trim();if(!topic){toast('Add a topic or video description first.');$('#topic').focus();return}const lang=$('#language').value.startsWith('Other')?($('#customLanguage').value.trim()||'English'):$('#language').value,tone=$('#tone').value,button=$('#generate');button.disabled=true;button.textContent='✦  Creating with AI…';$('#result').classList.remove('empty');$('#result').textContent='QREVIA is creating your content…';try{const response=await fetch('/.netlify/functions/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({topic,tool:selected,platform,language:lang,tone})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'The AI service could not complete the request.');if(!data.result)throw new Error('The AI returned an empty result. Please try again.');$('#result').textContent=`${selected} · ${platform} · ${lang} · ${tone}\n\n${data.result}\n\n— QREVIA Studio`;toast('Your AI content is ready!')}catch(error){$('#result').textContent='We could not generate content.\n\n'+error.message+'\n\nCheck that the Netlify Function is deployed and OPENAI_API_KEY is set.';toast('AI generation failed.')}finally{button.disabled=false;button.textContent='✦  Generate content'}});
 $('#copy').addEventListener('click',async()=>{const t=$('#result').textContent;if($('#result').classList.contains('empty')){toast('Nothing to copy yet.');return}try{await navigator.clipboard.writeText(t);toast('Copied to clipboard!')}catch(e){toast('Select and copy the result manually.')}});$('#clear').addEventListener('click',()=>{$('#result').textContent='✧\nReady when you are.\nDescribe your idea and choose Generate.';$('#result').classList.add('empty');toast('Result cleared.')});
+
+// QREVIA navigation and feature-card actions
+(() => {
+  const links = [...document.querySelectorAll('.sidebar a.nav')];
+  const cards = [...document.querySelectorAll('.featuregrid .feature')];
+  const workspace = document.querySelector('.workspace');
+  const result = document.querySelector('#result');
+  const topic = document.querySelector('#topic');
+  const tools = document.querySelector('#tools');
+
+  function goTo(element) {
+    if (element) element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function chooseTool(name) {
+    const button = [...document.querySelectorAll('#tools .tool')]
+      .find(b => b.dataset.tool === name);
+    if (button) button.click();
+    goTo(workspace);
+    topic?.focus();
+  }
+
+  links.forEach(link => {
+    link.style.cursor = 'pointer';
+    link.addEventListener('click', event => {
+      event.preventDefault();
+      const name = link.textContent.trim().toLowerCase();
+      links.forEach(a => a.classList.remove('active'));
+      link.classList.add('active');
+
+      if (name.includes('dashboard')) window.scrollTo({top: 0, behavior: 'smooth'});
+      else if (name.includes('create content')) goTo(workspace);
+      else if (name.includes('content ideas')) chooseTool('Content ideas');
+      else if (name.includes('rewrite')) chooseTool('Rewrite');
+      else if (name.includes('translate')) {
+        goTo(workspace);
+        document.querySelector('#language')?.focus();
+      }
+      else if (name.includes('saved results')) goTo(result);
+      else if (name.includes('my account')) window.location.href = '/login.html';
+    });
+  });
+
+  const brand = document.querySelector('.sidebar .brand');
+  if (brand) {
+    brand.style.cursor = 'pointer';
+    brand.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+  }
+
+  const avatar = document.querySelector('.topbar .avatar');
+  if (avatar) {
+    avatar.style.cursor = 'pointer';
+    avatar.addEventListener('click', () => window.location.href = '/login.html');
+  }
+
+  cards.forEach((card, index) => {
+    card.style.cursor = 'pointer';
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    const act = () => {
+      if (index === 0) chooseTool('Caption');
+      else if (index === 1) chooseTool('Hashtags');
+      else if (index === 2) {
+        goTo(workspace);
+        document.querySelector('#language')?.focus();
+      }
+      else goTo(workspace);
+    };
+    card.addEventListener('click', act);
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        act();
+      }
+    });
+  });
+})();
+
 </script></body></html>
