@@ -104,12 +104,13 @@ $('#copy').addEventListener('click',async()=>{const t=$('#result').textContent;i
     };
     card.addEventListener('click', act);
     card.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
+      if (e.key === 'Enter' || e.key === ' ') {https://github.com/soitanaetapato162-max/qrevia-studio/edit/main/index.html
         e.preventDefault();
         act();
       }
     });
   });
 })();
-
-</script></body></html>
+</script>
+<button onclick="sessionStorage.removeItem('qrevia_logged_in'); window.location.href='/login.html';" style="position:fixed;bottom:20px;right:20px;padding:12px 20px;background:#8066ff;color:white;border:0;border-radius:12px;z-index:9999;">Log Out</button>
+</body></html>
