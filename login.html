@@ -68,7 +68,8 @@ async function authenticate(){
     ? "Account created! You can now log in."
     : "Check your email to confirm your account.";
   }else{
-   window.location.href="/index.html";
+   sessionStorage.setItem('qrevia_logged_in', 'true');
+window.location.href="/index.html";
   }
  }catch(e){
   msg.textContent=e.message || "Something went wrong.";
