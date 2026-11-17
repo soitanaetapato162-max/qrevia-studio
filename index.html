@@ -29,8 +29,20 @@
  <div class="foot">QREVIA Studio · AI-powered creator tools</div></div></main></div><div class="toast" id="toast"></div>
 <script>
 const $=s=>document.querySelector(s);let selected='Caption';let platform='All platforms';
-$('#platforms').addEventListener('click',e=>{if(!e.target.classList.contains('platform'))return;document.querySelectorAll('.platform').forEach(x=>x.classList.remove('selected'));e.target.classList.add('selected');platform=e.target.textContent.trim()});
-$('#tools').addEventListener('click',e=>{const b=e.target.closest('.tool');if(!b)return;document.querySelectorAll('.tool').forEach(x=>x.classList.remove('active'));b.classList.add('active');selected=b.dataset.tool});
+$('#platforms').addEventListener('click', e => {
+  const b = e.target.closest('.platform');
+  if (!b) return;
+  document.querySelectorAll('.platform').forEach(x => x.classList.remove('selected'));
+  b.classList.add('selected');
+  platform = b.textContent.trim();
+});
+$('#tools').addEventListener('click', e => {
+  const b = e.target.closest('.tool');
+  if (!b) return;
+  document.querySelectorAll('.tool').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  selected = b.dataset.tool;
+});
 function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1800)}
 $('#language').addEventListener('change',()=>{$('#customLanguage').style.display=$('#language').value.startsWith('Other')?'block':'none'});
 $('#generate').addEventListener('click',async()=>{const topic=$('#topic').value.trim();if(!topic){toast('Add a topic or video description first.');$('#topic').focus();return}const lang=$('#language').value.startsWith('Other')?($('#customLanguage').value.trim()||'English'):$('#language').value,tone=$('#tone').value,button=$('#generate');button.disabled=true;button.textContent='✦  Creating with AI…';$('#result').classList.remove('empty');$('#result').textContent='QREVIA is creating your content…';try{const response=await fetch('/.netlify/functions/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({topic,tool:selected,platform,language:lang,tone})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'The AI service could not complete the request.');if(!data.result)throw new Error('The AI returned an empty result. Please try again.');$('#result').textContent=`${selected} · ${platform} · ${lang} · ${tone}\n\n${data.result}\n\n— QREVIA Studio`;toast('Your AI content is ready!')}catch(error){$('#result').textContent='We could not generate content.\n\n'+error.message+'\n\nCheck that the Netlify Function is deployed and OPENAI_API_KEY is set.';toast('AI generation failed.')}finally{button.disabled=false;button.textContent='✦  Generate content'}});
