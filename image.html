@@ -68,13 +68,18 @@ const img=document.createElement("img");
 img.src=data.image;
 img.alt="AI generated image";
 result.appendChild(img);
-const link=document.createElement("a");
-link.href=data.image;
-link.download="qrevia-image.png";
-link.textContent="Download Image";
-link.style.display="block";
-link.style.marginTop="16px";
+
+const link = document.createElement("a");
+const imageResponse = await fetch(data.image);
+const imageBlob = await imageResponse.blob();
+const imageUrl = URL.createObjectURL(imageBlob);
+link.href = imageUrl;
+link.download = "qrevia-image.png";
+link.textContent = "Download Image";
+link.style.display = "block";
+link.style.marginTop = "16px";
 result.appendChild(link);
+
 status.textContent="Image generated successfully!";
 }catch(error){
 status.textContent=error.message||"Please try again.";
