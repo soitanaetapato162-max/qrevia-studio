@@ -29,12 +29,39 @@ footer{padding:25px;font-size:13px}
 <p>AI image generation and editing</p>
 <p>AI-powered creative tools</p>
 <p>Cancel your subscription anytime</p>
-<button disabled style="opacity:.6">Checkout Coming Soon</button>
+<button id="checkoutBtn" onclick="startCheckout()">Subscribe Now — $7/month</button>
 <p>Secure payments powered by Paddle</p>
 </div>
 </main>
 <footer>
 <a href="/legal.html">Terms · Privacy · Refund Policy</a>
 </footer>
+  <script>
+async function startCheckout() {
+  const button = document.getElementById("checkoutBtn");
+  button.disabled = true;
+  button.textContent = "Opening secure checkout...";
+
+  try {
+    const response = await fetch("/.netlify/functions/paddle-checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({})
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.checkoutUrl) {
+      throw new Error(data.error || "Checkout unavailable");
+    }
+
+    window.location.href = data.checkoutUrl;
+  } catch (error) {
+    alert("Checkout is not ready yet: " + error.message);
+    button.disabled = false;
+    button.textContent = "Subscribe Now — $7/month";
+  }
+}
+</script>
 </body>
 </html>
