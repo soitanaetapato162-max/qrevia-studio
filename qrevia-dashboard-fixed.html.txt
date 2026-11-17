@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QREVIA Studio — Creator Workspace</title>
+<style>
+:root{color-scheme:dark;--bg:#090a14;--panel:#15182b;--line:#303450;--text:#f7f7ff;--muted:#b0b4cc;--accent:#916bff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top right,#282052,transparent 55%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,sans-serif}button,select,textarea,input{font:inherit}button,a{touch-action:manipulation}button{cursor:pointer}a{color:inherit}.app{max-width:1150px;margin:auto;padding:18px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0 20px}.brand{font-size:23px;font-weight:850;letter-spacing:1px;text-decoration:none}.brand span{color:#a88aff}.small{font-size:12px;color:var(--muted)}.nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:25px}.nav button,.nav a,.platform,.tool,.secondary{border:1px solid var(--line);background:#161a30;color:var(--text);border-radius:11px;padding:10px 12px;text-decoration:none}.nav button.active,.platform.selected,.tool.active{background:#38265f;border-color:#aa8aff}.hero h1{font-size:clamp(29px,6vw,42px);line-height:1.15;margin:8px 0}.hero h1 span{color:#a88aff}.hero p{color:var(--muted);margin:0 0 22px}.platforms{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}.layout{display:grid;grid-template-columns:1.2fr .85fr;gap:16px}.card{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:20px}.card h2{font-size:18px;margin:0 0 5px}.field{display:block;margin:16px 0 7px;font-size:13px}.sub{font-size:12px;color:var(--muted)}textarea,select,input{width:100%;padding:12px;background:#0c1020;border:1px solid #414664;border-radius:10px;color:white}textarea{min-height:110px;resize:vertical}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.tools{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0}.tool{text-align:left}.tool strong,.tool small{display:block}.tool small{font-size:11px;color:var(--muted)}.primary{background:linear-gradient(90deg,#793be7,#337cdb);border:0;border-radius:11px;color:white;padding:14px 16px;font-weight:800;width:100%}.primary:disabled{opacity:.6}.result{white-space:pre-wrap;overflow-wrap:anywhere;min-height:180px;background:#0d1020;border:1px dashed #444b70;border-radius:12px;padding:15px}.actions,.links{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.links a{background:#25204a;padding:12px;border-radius:10px;text-decoration:none}.status{min-height:22px;color:#c6b5ff;font-size:13px;margin-top:9px}.footer{padding:24px 0;text-align:center;color:var(--muted);font-size:12px}.footer a{margin:0 6px}@media(max-width:760px){.layout{grid-template-columns:1fr}.app{padding:14px}.card{padding:16px}}@media(max-width:420px){.two{grid-template-columns:1fr}.nav button,.nav a{font-size:12px;padding:9px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><a class="brand" href="#top" id="brand">QREVIA<span>.</span> STUDIO</a><a class="small" href="/login.html" id="account">My account</a></header>
+<nav class="nav" aria-label="Creator workspace navigation">
+<button type="button" data-action="dashboard" class="active">Dashboard</button>
+<button type="button" data-action="create">Create content</button>
+<button type="button" data-action="ideas">Content ideas</button>
+<button type="button" data-action="rewrite">Rewrite & improve</button>
+<button type="button" data-action="translate">Translate</button>
+<button type="button" data-action="saved">Saved result</button>
+<a href="/login.html">My account</a>
+</nav>
+<section class="hero" id="top"><div class="small">YOUR CREATIVE ADVANTAGE</div><h1>Create content that <span>connects.</span></h1><p>Turn your ideas into captions, hashtags, titles and more.</p></section>
+<div class="platforms" id="platforms" aria-label="Select a platform">
+<button type="button" class="platform selected" data-platform="All platforms">All platforms</button>
+<button type="button" class="platform" data-platform="TikTok">TikTok</button>
+<button type="button" class="platform" data-platform="Instagram">Instagram</button>
+<button type="button" class="platform" data-platform="YouTube">YouTube</button>
+<button type="button" class="platform" data-platform="Facebook">Facebook</button>
+<button type="button" class="platform" data-platform="X">X</button>
+<button type="button" class="platform" data-platform="LinkedIn">LinkedIn</button>
+<button type="button" class="platform" data-platform="Pinterest">Pinterest</button>
+</div>
+<div class="layout" id="workspace">
+<section class="card"><h2>What are we creating today?</h2><div class="sub">Describe your post or video.</div>
+<label class="field" for="topic">Your topic or video description</label><textarea id="topic" maxlength="500" placeholder="Example: My raw egg peeling challenge on TikTok"></textarea>
+<div class="two"><div><label class="field" for="language">Language</label><select id="language"></select><input id="customLanguage" placeholder="Type any language" style="display:none;margin-top:8px"></div><div><label class="field" for="tone">Tone of voice</label><select id="tone"><option>Engaging</option><option>Funny</option><option>Professional</option><option>Inspirational</option><option>Friendly</option><option>Emotional</option><option>Bold</option></select></div></div>
+<label class="field">Choose a tool</label><div class="tools" id="tools">
+<button type="button" class="tool active" data-tool="Caption"><strong>✦ Caption generator</strong><small>Write engaging captions</small></button>
+<button type="button" class="tool" data-tool="Hashtags"><strong># Smart hashtags</strong><small>Find relevant tags</small></button>
+<button type="button" class="tool" data-tool="Title"><strong>▣ Title generator</strong><small>Catch attention fast</small></button>
+<button type="button" class="tool" data-tool="Description"><strong>≡ Description writer</strong><small>Explain your content</small></button>
+<button type="button" class="tool" data-tool="Bio"><strong>◎ Bio generator</strong><small>Introduce your profile</small></button>
+<button type="button" class="tool" data-tool="Content ideas"><strong>☼ Content ideas</strong><small>Find your next post</small></button>
+</div><button type="button" class="primary" id="generate">✦ Generate content</button><div id="status" class="status" role="status" aria-live="polite"></div></section>
+<section class="card"><h2>Your result</h2><p class="sub">Your generated content will appear here.</p><div class="result" id="result">Ready when you are. Describe your idea and choose Generate.</div><div class="actions"><button type="button" class="secondary" id="copy">Copy result</button><button type="button" class="secondary" id="clear">Clear</button></div></section>
+</div>
+<div class="links"><a href="/image.html">🎨 AI Image Studio</a><a href="/edit-image.html">✨ Edit AI Images</a><a href="/pricing.html">⭐ Upgrade to QREVIA Pro — $7/month</a></div>
+<footer class="footer"><a href="/legal.html">Privacy Policy · Terms · Refunds</a><button type="button" class="secondary" id="logout">Log Out</button><div>QREVIA Studio · AI-powered creator tools</div></footer>
+</div>
+<script>
+'use strict';
+const $ = selector => document.querySelector(selector);
+let selected = 'Caption';
+let platform = 'All platforms';
+let lastResult = '';
+const languages = 'Afrikaans|Albanian|Amharic|Arabic|Armenian|Assamese|Azerbaijani|Basque|Bengali|Bosnian|Bulgarian|Burmese|Catalan|Cebuano|Chinese (Simplified)|Chinese (Traditional)|Croatian|Czech|Danish|Dari|Dutch|English|Estonian|Farsi (Persian)|Filipino|Finnish|French|Georgian|German|Greek|Gujarati|Haitian Creole|Hausa|Hawaiian|Hebrew|Hindi|Hungarian|Icelandic|Igbo|Indonesian|Irish|Italian|Japanese|Javanese|Kannada|Kazakh|Khmer|Kinyarwanda|Korean|Kurdish|Lao|Latin|Latvian|Lithuanian|Macedonian|Malagasy|Malay|Malayalam|Maltese|Maori|Marathi|Mongolian|Nepali|Norwegian|Oromo|Pashto|Polish|Portuguese|Punjabi|Romanian|Russian|Serbian|Shona|Sinhala|Slovak|Slovenian|Somali|Spanish|Swahili|Swedish|Tamil|Telugu|Thai|Tigrinya|Turkish|Ukrainian|Urdu|Uzbek|Vietnamese|Welsh|Xhosa|Yoruba|Zulu|Other (enter a language)'.split('|');
+for (const language of languages) {
+  const option = document.createElement('option');
+  option.textContent = language;
+  option.value = language;
+  $('#language').append(option);
+}
+$('#language').value = 'English';
+function status(message) { $('#status').textContent = message; }
+function selectTool(name) {
+  const button = [...document.querySelectorAll('#tools .tool')].find(item => item.dataset.tool === name);
+  if (!button) return false;
+  document.querySelectorAll('#tools .tool').forEach(item => item.classList.toggle('active', item === button));
+  selected = name;
+  return true;
+}
+$('#platforms').addEventListener('click', event => {
+  const button = event.target.closest('button[data-platform]');
+  if (!button) return;
+  document.querySelectorAll('#platforms .platform').forEach(item => item.classList.toggle('selected', item === button));
+  platform = button.dataset.platform;
+  status('Platform selected: ' + platform);
+});
+$('#tools').addEventListener('click', event => {
+  const button = event.target.closest('button[data-tool]');
+  if (!button) return;
+  selectTool(button.dataset.tool);
+  status('Tool selected: ' + selected);
+});
+$('#language').addEventListener('change', () => {
+  $('#customLanguage').style.display = $('#language').value.startsWith('Other') ? 'block' : 'none';
+});
+function goToWorkspace() { $('#workspace').scrollIntoView({behavior:'smooth',block:'start'}); }
+document.querySelectorAll('.nav button[data-action]').forEach(button => {
+  button.addEventListener('click', () => {
+    document.querySelectorAll('.nav button[data-action]').forEach(item => item.classList.toggle('active', item === button));
+    const action = button.dataset.action;
+    if (action === 'dashboard') window.scrollTo({top:0,behavior:'smooth'});
+    if (action === 'create') { goToWorkspace(); $('#topic').focus(); }
+    if (action === 'ideas') { selectTool('Content ideas'); goToWorkspace(); }
+    if (action === 'rewrite') { selectTool('Description'); goToWorkspace(); status('Describe the text you want rewritten, then generate a new version.'); }
+    if (action === 'translate') { goToWorkspace(); $('#language').focus(); status('Choose your target language and describe what to translate.'); }
+    if (action === 'saved') { $('#result').scrollIntoView({behavior:'smooth'}); status(lastResult ? 'Your latest result is shown.' : 'No saved result yet.'); }
+  });
+});
+$('#generate').addEventListener('click', async () => {
+  const topic = $('#topic').value.trim();
+  if (!topic) { status('Add a topic or video description first.'); $('#topic').focus(); return; }
+  const language = $('#language').value.startsWith('Other') ? ($('#customLanguage').value.trim() || 'English') : $('#language').value;
+  const tone = $('#tone').value;
+  const button = $('#generate');
+  button.disabled = true;
+  button.textContent = '✦ Creating with AI…';
+  $('#result').textContent = 'QREVIA is creating your content…';
+  status('Generating…');
+  try {
+    const response = await fetch('/.netlify/functions/generate', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({topic,tool:selected,platform,language,tone})
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || 'The AI service could not complete the request.');
+    const generated = data.result || data.text;
+    if (!generated) throw new Error('The AI returned an empty result.');
+    lastResult = `${selected} · ${platform} · ${language} · ${tone}\n\n${generated}\n\n— QREVIA Studio`;
+    $('#result').textContent = lastResult;
+    status('Your content is ready!');
+  } catch (error) {
+    $('#result').textContent = 'We could not generate content.\n\n' + error.message;
+    status('AI generation failed.');
+  } finally {
+    button.disabled = false;
+    button.textContent = '✦ Generate content';
+  }
+});
+$('#copy').addEventListener('click', async () => {
+  if (!lastResult) { status('Nothing to copy yet.'); return; }
+  try { await navigator.clipboard.writeText(lastResult); status('Copied!'); }
+  catch { status('Copy unavailable. Select the result text manually.'); }
+});
+$('#clear').addEventListener('click', () => {
+  lastResult = '';
+  $('#result').textContent = 'Ready when you are. Describe your idea and choose Generate.';
+  status('Result cleared.');
+});
+$('#logout').addEventListener('click', () => {
+  sessionStorage.removeItem('qrevia_logged_in');
+  window.location.href = '/login.html';
+});
+</script>
+</body>
+</html>
