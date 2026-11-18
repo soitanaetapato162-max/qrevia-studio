@@ -5,12 +5,35 @@ exports.handler = async (event) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   });
+try {
+  const token = (event.headers.authorization || "").replace(/^Bearer\s+/i, "").trim();
+  if (!token) {
+    return json(401, { error: "Please log in to generate images." });
+  }
+
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return json(503, { error: "Authentication is not configured." });
+  }
+
+  const authResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
+    headers: {
+      apikey: supabaseKey,
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (!authResponse.ok) {
+    return json(401, { error: "Please log in again." });
+  }
 
   if (event.httpMethod !== "POST") {
     return json(405, { error: "Method not allowed." });
   }
 
-  try {
+  
     const { prompt, size = "1024x1024" } =
       JSON.parse(event.body || "{}");
 
