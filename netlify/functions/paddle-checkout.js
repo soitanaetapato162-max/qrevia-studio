@@ -40,7 +40,8 @@ exports.handler = async (event) => {
       return {
         statusCode: response.status,
         body: JSON.stringify({
-          error: "Paddle checkout failed"
+error: "Paddle checkout failed",
+details: data.error?.detail || data.error?.code || "Unknown Paddle error"
         })
       };
     }
