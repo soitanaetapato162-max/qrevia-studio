@@ -61,6 +61,55 @@ try {
       return json(500, { error: "AI service is not configured." });
     }
 
+const user = await authResponse.json();
+const userId = user.id;
+
+const today = new Date().toISOString().slice(0, 10);
+const feature = "image";
+
+const subscriptionResponse = await fetch(
+  `${supabaseUrl}/rest/v1/subscriptions?user_id=eq.${encodeURIComponent(userId)}&select=subscription_status&limit=1`,
+  {
+    headers: {
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`
+    }
+  }
+);
+
+if (!subscriptionResponse.ok) {
+  return json(503, { error: "Could not check subscription." });
+}
+
+const subscriptions = await subscriptionResponse.json();
+const isPro = subscriptions[0]?.subscription_status === "active";
+const dailyLimit = isPro ? 10 : 1;
+
+const usageResponse = await fetch(
+  `${supabaseUrl}/rest/v1/daily_usage?user_id=eq.${encodeURIComponent(userId)}&usage_date=eq.${today}&feature=eq.${feature}&select=usage_count`,
+  {
+    headers: {
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`
+    }
+  }
+);
+
+if (!usageResponse.ok) {
+  return json(503, { error: "Could not check daily usage." });
+}
+
+const usageRows = await usageResponse.json();
+const usedToday = usageRows.reduce(
+  (total, row) => total + row.usage_count, 0
+);
+
+if (usedToday >= dailyLimit) {
+  return json(429, {
+    error: "Daily image limit reached. Upgrade to Pro or try tomorrow."
+  });
+}
+
     const response = await fetch(
       "https://api.openai.com/v1/images/generations",
       {
@@ -95,6 +144,29 @@ try {
         error: "The image service returned no image."
       });
     }
+
+const usageUpdate = await fetch(
+  `${supabaseUrl}/rest/v1/daily_usage`,
+  {
+    method: "POST",
+    headers: {
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+      "Content-Type": "application/json",
+      Prefer: "resolution=merge-duplicates"
+    },
+    body: JSON.stringify({
+      user_id: userId,
+      usage_date: today,
+      feature: feature,
+      usage_count: usedToday + 1
+    })
+  }
+);
+
+if (!usageUpdate.ok) {
+  return json(503, { error: "Could not record image usage." });
+}
 
     return json(200, {
       image: `data:image/png;base64,${image}`
