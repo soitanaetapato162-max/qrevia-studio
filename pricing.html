@@ -52,7 +52,7 @@ async function startCheckout() {
     const data = await response.json();
 
     if (!response.ok || !data.checkoutUrl) {
-      throw new Error(data.error || "Checkout unavailable");
+  throw new Error(data.details || data.error || "Checkout unavailable");
     }
 
     window.location.href = data.checkoutUrl;
