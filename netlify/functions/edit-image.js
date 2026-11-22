@@ -23,6 +23,22 @@ exports.handler = async (event) => {
       });
     }
 
+const blockedFaceEdits = [
+  /\bface[\s-]?swap(?:ping)?\b/i,
+  /\bswap\s+(?:the\s+)?faces?\b/i,
+  /\breplace\s+(?:the\s+|my\s+|his\s+|her\s+)?face\b/i,
+  /\bchange\s+(?:the\s+|my\s+|his\s+|her\s+)?face\b/i,
+  /\bmodify\s+(?:the\s+|my\s+|his\s+|her\s+)?face\b/i,
+  /\bchange\s+(?:the\s+)?(?:eyes|nose|mouth|facial features)\b/i,
+  /\bmake\s+(?:me|him|her|them)\s+look\s+(?:younger|older)\b/i
+];
+
+if (blockedFaceEdits.some(rule => rule.test(prompt))) {
+  return reply(400, {
+    error: "Face-swapping and facial manipulation are not supported. Please request another type of photo edit."
+  });
+}
+
     if (!process.env.OPENAI_API_KEY) {
       return reply(500, { error: "API key not configured" });
     }
