@@ -25,7 +25,9 @@ exports.handler = async (event) => {
 
 const blockedFaceEdits = [
   /\bface[\s-]?swap(?:ping)?\b/i,
-  /\bswap\s+(?:the\s+)?faces?\b/i,
+ 
+/\b(?:swap|switch|exchange)\s+(?:(?:my|his|her|their|the|our|a|another\s+person'?s)\s+)?faces?\b/i,
+
   /\breplace\s+(?:the\s+|my\s+|his\s+|her\s+)?face\b/i,
   /\bchange\s+(?:the\s+|my\s+|his\s+|her\s+)?face\b/i,
   /\bmodify\s+(?:the\s+|my\s+|his\s+|her\s+)?face\b/i,
