@@ -26,6 +26,9 @@ button{background:#8066ff;color:white;border:0;font-weight:bold;cursor:pointer}
 <input id="password" type="password" placeholder="Password" autocomplete="current-password">
 <button id="submit" onclick="authenticate()">Log In</button>
 <div id="message" role="status"></div>
+ <div class="link" id="forgot" onclick="forgotPassword()">
+  Forgot Password?
+</div>
 <div class="link" onclick="switchMode()" id="switch">Create an account</div>
 </div>
 
@@ -77,6 +80,27 @@ window.location.href="/index.html";
   btn.disabled=false;
  }
 }
+
+async function forgotPassword() {
+  const email = document.getElementById("email").value.trim();
+  const msg = document.getElementById("message");
+
+  if (!email) {
+    msg.textContent = "Enter your email address first.";
+    return;
+  }
+
+  msg.textContent = "Sending password reset email...";
+
+  const { error } = await db.auth.resetPasswordForEmail(email, {
+    redirectTo: "https://qreviastudio.com/update-password.html"
+  });
+
+  msg.textContent = error
+    ? error.message
+    : "Check your email for the password reset link.";
+}
+
 </script>
 </body>
 </html>
