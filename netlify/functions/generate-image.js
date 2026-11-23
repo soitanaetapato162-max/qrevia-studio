@@ -83,7 +83,7 @@ if (!subscriptionResponse.ok) {
 
 const subscriptions = await subscriptionResponse.json();
 const isPro = subscriptions[0]?.subscription_status === "active";
-const dailyLimit = isPro ? 10 : 1;
+const dailyLimit = isPro ? 5 : 0;
 
 const usageResponse = await fetch(
   `${supabaseUrl}/rest/v1/daily_usage?user_id=eq.${encodeURIComponent(userId)}&usage_date=eq.${today}&feature=eq.${feature}&select=usage_count`,
