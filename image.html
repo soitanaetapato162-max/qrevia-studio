@@ -44,8 +44,12 @@ img{width:100%;border-radius:14px;margin-top:20px}
 <div id="result"></div>
 </div>
 </main>
-<script>
-async function generateImage(){
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+const SUPABASE_URL = "https://slccglpnidvkpjjjwnit.supabase.co";
+const SUPABASE_KEY = "sb_publishable_E08YJQlfCan8kpSgLohwDg_A0zDJzOy";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    async function generateImage(){
 const prompt=document.getElementById("prompt").value.trim();
 const size=document.getElementById("size").value;
 const button=document.getElementById("generate");
@@ -56,9 +60,13 @@ button.disabled=true;
 status.textContent="Generating your image...";
 result.innerHTML="";
 try{
-const response=await fetch("/.netlify/functions/generate-image",{
+const {data:{session}} = await db.auth.getSession();
+if(!session){
+  throw new Error("Please log in first.");
+}
+  const response=await fetch("/.netlify/functions/generate-image",{
 method:"POST",
-headers:{"Content-Type":"application/json"},
+headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},
 body:JSON.stringify({prompt,size})
 });
 const data=await response.json();
