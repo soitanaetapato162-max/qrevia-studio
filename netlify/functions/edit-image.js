@@ -15,6 +15,60 @@ exports.handler = async (event) => {
   }
 
   try {
+   
+const token = (event.headers.authorization || "")
+  .replace(/^Bearer\s+/i, "").trim();
+
+if (!token) {
+  return reply(401, {
+    error: "Please log in and subscribe to Pro to edit images."
+  });
+}
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  return reply(503, {
+    error: "Subscription verification is unavailable."
+  });
+}
+
+const authResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
+  headers: {
+    apikey: supabaseKey,
+    Authorization: `Bearer ${token}`
+  }
+});
+
+if (!authResponse.ok) {
+  return reply(401, { error: "Please log in again." });
+}
+
+const user = await authResponse.json();
+
+const subscriptionResponse = await fetch(
+  `${supabaseUrl}/rest/v1/subscriptions?user_id=eq.${encodeURIComponent(user.id)}&subscription_status=eq.active&select=id&limit=1`,
+  {
+    headers: {
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`
+    }
+  }
+);
+
+if (!subscriptionResponse.ok) {
+  return reply(503, { error: "Could not verify subscription." });
+}
+
+const subscriptions = await subscriptionResponse.json();
+
+if (subscriptions.length === 0) {
+  return reply(403, {
+    error: "Image editing is available only to Pro subscribers."
+  });
+}
+ 
     const { image, prompt } = JSON.parse(event.body || "{}");
 
     if (!image || !prompt?.trim()) {
