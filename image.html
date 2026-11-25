@@ -2,7 +2,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<script>
+if (localStorage.getItem("qrevia_analytics_consent") === "accepted") {
+  const tag = document.createElement("script");
+  tag.async = true;
+  tag.src = "https://www.googletagmanager.com/gtag/js?id=G-EVE1CE24HK";
+  document.head.appendChild(tag);
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+  gtag("config", "G-EVE1CE24HK");
+}
+</script>
+  <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI Image Generator | QREVIA Studio</title>
 <style>
