@@ -127,7 +127,11 @@ small{color:#c4c4d5}
 </div>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL = "https://slccglpnidvkpjjjwnit.supabase.co";
+const SUPABASE_KEY = "sb_publishable_E08YJQlfCan8kpSgLohwDg_A0zDJzOy";
+const db = supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const photo = document.getElementById("photo");
 const preview = document.getElementById("preview");
 const result = document.getElementById("result");
@@ -190,14 +194,23 @@ async function editPhoto() {
       reader.readAsDataURL(file);
     });
 
-    const response = await fetch(
-      "/.netlify/functions/edit-image",
-      {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({image,prompt})
-      }
-    );
+    const { data: { session }, error } = await db.auth.getSession();
+
+if (error || !session) {
+  throw new Error("Please log in to your account.");
+}
+
+const response = await fetch(
+  "/.netlify/functions/edit-image",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + session.access_token
+    },
+    body: JSON.stringify({image, prompt})
+  }
+);
 
     const data = await response.json();
 
