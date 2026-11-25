@@ -221,7 +221,7 @@ const response = await fetch(
     result.src = data.image;
     result.style.display = "block";
    const blob = await fetch(data.image).then(r => r.blob());
-const file = new File([blob], "qrevia-edited-photo.png", {type: "image/png"});
+const editedFile = new File([blob], "qrevia-edited-photo.png", {type: "image/png"});
 
 if (download.href.startsWith("blob:")) {
   URL.revokeObjectURL(download.href);
@@ -230,10 +230,10 @@ if (download.href.startsWith("blob:")) {
 download.href = URL.createObjectURL(blob);
 
 download.onclick = async (e) => {
-  if (navigator.canShare && navigator.canShare({files: [file]})) {
+if (navigator.canShare && navigator.canShare({files: [editedFile]})) {
     e.preventDefault();
     try {
-      await navigator.share({files: [file]});
+await navigator.share({files: [editedFile]});
     } catch (error) {
       if (error.name !== "AbortError") {
         alert("Press and hold the photo to save it.");
