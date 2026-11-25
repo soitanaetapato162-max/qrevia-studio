@@ -75,7 +75,7 @@ exports.handler = async (event) => {
       s.subscription_status === "active" ||
       (s.agentaos_subscription_id &&
      Date.parse(s.current_period_end) > Date.now()
-    )) {
+    ))) {
       return reply(409, {
         error: "You already have a subscription"
       });
