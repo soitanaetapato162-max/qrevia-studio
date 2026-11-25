@@ -62,7 +62,10 @@ document.getElementById("logout").addEventListener("click",async()=>{
     button.disabled=false;
   }
 });
-
+const upgrade = document.createElement("button");
+upgrade.textContent = "Upgrade to Pro — $12/month";
+upgrade.disabled = true;
+document.getElementById("details").appendChild(upgrade);
 checkAccount();
 </script>
 </body>
