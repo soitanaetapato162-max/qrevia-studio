@@ -126,7 +126,8 @@ if (blockedFaceEdits.some(rule => rule.test(prompt))) {
     const form = new FormData();
     form.append("model", "gpt-image-1-mini");
     form.append("prompt", prompt.trim());
-    form.append("size", "1024x1024");
+   form.append("size", "1024x1024");
+form.append("quality", "low");
     form.append(
       "image",
       new Blob([buffer], { type: types[match[1]] }),
