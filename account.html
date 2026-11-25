@@ -21,7 +21,7 @@ button:disabled{opacity:.6}
 <p id="status">Checking your login...</p>
 <div id="details" hidden>
 <p><strong>Email:</strong> <span id="email"></span></p>
-<p><strong>Subscription:</strong> Check billing status</p>
+<p><strong>Subscription:</strong> <span id="subscription">Checking...</span></p>
 <a class="btn" href="/index.html">Back to Dashboard</a>
 <button id="logout">Log Out</button>
 </div>
@@ -44,6 +44,25 @@ async function checkAccount(){
     document.getElementById("email").textContent=data.user.email || "Not available";
     status.textContent="You are logged in.";
     document.getElementById("details").hidden=false;
+const { data: sub, error: subError } = await db
+  .from("subscriptions")
+  .select("subscription_status,current_period_end")
+  .eq("user_id", data.user.id)
+  .maybeSingle();
+
+const plan = document.getElementById("subscription");
+
+if (subError) {
+  plan.textContent = "Unable to verify subscription";
+} else {
+  const active = sub?.subscription_status === "active" &&
+    Date.parse(sub.current_period_end) > Date.now();
+
+  plan.textContent = active ? "Pro Plan — Active" : "Free Plan";
+  upgrade.hidden = active;
+  upgrade.disabled = active;
+  upgrade.onclick = () => window.location.href = "/pricing.html";
+}
   }catch(e){
     status.textContent="Unable to check your account. Please refresh.";
   }
