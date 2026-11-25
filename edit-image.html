@@ -118,7 +118,7 @@ small{color:#c4c4d5}
   <a id="download" class="download"
     style="display:none"
     download="qrevia-edited-photo.png">
-    Download Edited Photo
+   Save / Download Photo
   </a>
 
   <p style="text-align:center">
@@ -220,7 +220,27 @@ const response = await fetch(
 
     result.src = data.image;
     result.style.display = "block";
-    download.href = data.image;
+   const blob = await fetch(data.image).then(r => r.blob());
+const file = new File([blob], "qrevia-edited-photo.png", {type: "image/png"});
+
+if (download.href.startsWith("blob:")) {
+  URL.revokeObjectURL(download.href);
+}
+
+download.href = URL.createObjectURL(blob);
+
+download.onclick = async (e) => {
+  if (navigator.canShare && navigator.canShare({files: [file]})) {
+    e.preventDefault();
+    try {
+      await navigator.share({files: [file]});
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        alert("Press and hold the photo to save it.");
+      }
+    }
+  }
+};
     download.style.display = "block";
     statusText.textContent = "Photo edited successfully!";
   } catch (error) {
