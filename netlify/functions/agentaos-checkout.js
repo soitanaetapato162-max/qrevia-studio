@@ -55,7 +55,31 @@ exports.handler = async (event) => {
         error: "Checkout is not enabled yet"
       });
     }
+    const existing = await fetch(
+      `${supabaseUrl}/rest/v1/subscriptions?user_id=eq.${encodeURIComponent(user.id)}&select=subscription_status,agentaos_subscription_id,agentaos_period_end`,
+      {
+        headers: {
+          apikey: serviceKey,
+          Authorization: `Bearer ${serviceKey}`
+        }
+      }
+    );
 
+    if (!existing.ok) {
+      throw new Error("Subscription check failed");
+    }
+
+    const subscriptions = await existing.json();
+
+    if (subscriptions.some(s =>
+      s.subscription_status === "active" ||
+      (s.agentaos_subscription_id &&
+       Date.parse(s.agentaos_period_end) > Date.now())
+    )) {
+      return reply(409, {
+        error: "You already have a subscription"
+      });
+    }
     const response = await fetch(
       "https://api.agentaos.ai/api/v1/gateway/sessions",
       {
