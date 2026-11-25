@@ -163,7 +163,7 @@ exports.handler = async (event) => {
           user_id: userId,
           subscription_status: active ? "active" : "inactive",
           agentaos_subscription_id: subscriptionId,
-          agentaos_period_end: subscription.currentPeriodEnd
+          current_period_end: subscription.currentPeriodEnd
         })
       }
     );
