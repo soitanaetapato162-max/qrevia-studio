@@ -133,7 +133,34 @@ form.append("quality", "low");
       new Blob([buffer], { type: types[match[1]] }),
       "photo." + (match[1] === "jpeg" ? "jpg" : match[1])
     );
+const quotaResponse = await fetch(
+  `${supabaseUrl}/rest/v1/rpc/reserve_image_edit`,
+  {
+    method: "POST",
+    headers: {
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      p_user_id: user.id
+    })
+  }
+);
 
+if (!quotaResponse.ok) {
+  return reply(503, {
+    error: "Unable to verify daily usage."
+  });
+}
+
+const allowed = await quotaResponse.json();
+
+if (allowed !== true) {
+  return reply(429, {
+    error: "Daily limit of 5 photo edits reached. Try again tomorrow."
+  });
+}
     const response = await fetch(
       "https://api.openai.com/v1/images/edits",
       {
