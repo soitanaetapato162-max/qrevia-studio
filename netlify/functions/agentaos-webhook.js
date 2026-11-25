@@ -51,12 +51,131 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: "Invalid JSON" };
   }
 
-  if (payload.type === "webhook.test") {
+    if (payload.type === "webhook.test") {
     return { statusCode: 200, body: "Webhook verified" };
   }
 
-  return {
-    statusCode: 503,
-    body: "Payment processing not enabled yet"
-  };
+  const data = payload.data || {};
+  const metadata = data.metadata || {};
+
+  if (data.livemode !== true) {
+    return { statusCode: 200, body: "Test event ignored" };
+  }
+
+  const isCheckout =
+    payload.type === "checkout.session.completed";
+
+  const isSubscription =
+    payload.type.startsWith("subscription.");
+
+  if (!isCheckout && !isSubscription) {
+    return { statusCode: 200, body: "Event ignored" };
+  }
+
+  const subscriptionId = isCheckout
+    ? metadata.subscriptionId
+    : data.id;
+
+  if (!subscriptionId) {
+    return { statusCode: 400, body: "Missing subscription ID" };
+  }
+
+  try {
+    const apiKey = process.env.AGENTAOS_API_KEY;
+    const productId = process.env.AGENTAOS_PRODUCT_ID;
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!apiKey || !productId || !supabaseUrl || !serviceKey) {
+      throw new Error("Missing configuration");
+    }
+
+    let subscription;
+
+    for (let offset = 0; ; offset += 100) {
+      const response = await fetch(
+        `https://api.agentaos.ai/api/v1/gateway/subscriptions?limit=100&offset=${offset}`,
+        { headers: { "x-api-key": apiKey } }
+      );
+
+      if (!response.ok) {
+        throw new Error("Subscription lookup failed");
+      }
+
+      const page = await response.json();
+
+      subscription = page.items.find(
+        item => item.id === subscriptionId
+      );
+
+      if (subscription || !page.hasMore) break;
+    }
+
+    if (!subscription) {
+      throw new Error("Subscription not found");
+    }
+
+    if (subscription.linkId !== productId) {
+      return { statusCode: 200, body: "Different product" };
+    }
+
+    const headers = {
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`,
+      "Content-Type": "application/json"
+    };
+
+    const table = `${supabaseUrl}/rest/v1/subscriptions`;
+
+    const lookup = await fetch(
+      `${table}?agentaos_subscription_id=eq.${encodeURIComponent(subscriptionId)}&select=user_id`,
+      { headers }
+    );
+
+    if (!lookup.ok) {
+      throw new Error("Database lookup failed");
+    }
+
+    const rows = await lookup.json();
+
+    const userId = rows[0]?.user_id ||
+      (isCheckout && !metadata.subscriptionCycle
+        ? metadata.customerId
+        : null);
+
+    if (!userId) {
+      return { statusCode: 503, body: "Awaiting checkout mapping" };
+    }
+
+    const active =
+      subscription.status === "active" &&
+      Date.parse(subscription.currentPeriodEnd) > Date.now();
+
+    const result = await fetch(
+      `${table}?on_conflict=user_id`,
+      {
+        method: "POST",
+        headers: {
+          ...headers,
+          Prefer: "resolution=merge-duplicates"
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          subscription_status: active ? "active" : "inactive",
+          agentaos_subscription_id: subscriptionId,
+          agentaos_period_end: subscription.currentPeriodEnd
+        })
+      }
+    );
+
+    if (!result.ok) {
+      throw new Error("Subscription update failed");
+    }
+
+    return { statusCode: 200, body: "Subscription synchronized" };
+
+  } catch (error) {
+    console.error(error.message);
+    return { statusCode: 503, body: "Subscription synchronization failed" };
+  }
 };
