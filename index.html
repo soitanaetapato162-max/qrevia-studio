@@ -51,7 +51,11 @@
 
 <footer class="footer"><a href="/legal.html">Privacy Policy · Terms · Refunds</a><button type="button" class="secondary" id="logout">Log Out</button><div>QREVIA Studio · AI-powered creator tools</div></footer>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL = "https://slccglpnidvkpjjjwnit.supabase.co";
+const SUPABASE_KEY = "sb_publishable_E08YJQlfCan8kpSgLohwDg_A0zDJzOy";
+const db = supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 'use strict';
 const $ = selector => document.querySelector(selector);
 let selected = 'Caption';
@@ -114,7 +118,11 @@ $('#generate').addEventListener('click', async () => {
   status('Generating…');
   try {
     const response = await fetch('/.netlify/functions/generate', {
-      method:'POST', headers:{'Content-Type':'application/json'},
+ method: 'POST',
+headers: {
+  'Content-Type': 'application/json',
+  'Authorization': 'Bearer ' + ((await db.auth.getSession()).data.session?.access_token || '')
+},
       body:JSON.stringify({topic,tool:selected,platform,language,tone})
     });
     const data = await response.json().catch(() => ({}));
@@ -125,8 +133,8 @@ $('#generate').addEventListener('click', async () => {
     $('#result').textContent = lastResult;
     status('Your content is ready!');
   } catch (error) {
-    $('#result').textContent = 'We could not generate content.\n\n' + error.message;
-    status('AI generation failed.');
+ $('#result').textContent = error.message;
+status(error.message);
   } finally {
     button.disabled = false;
     button.textContent = '✦ Generate content';
