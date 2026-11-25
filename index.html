@@ -1,7 +1,46 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  function enableAnalytics() {
+    const tag = document.createElement("script");
+    tag.async = true;
+    tag.src = "https://www.googletagmanager.com/gtag/js?id=G-EVE1CE24HK";
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function(){dataLayer.push(arguments);};
+    gtag("js", new Date());
+    gtag("config", "G-EVE1CE24HK");
+    document.head.appendChild(tag);
+  }
+
+  const choice = localStorage.getItem("qrevia_analytics_consent");
+  if (choice === "accepted") {
+    enableAnalytics();
+    return;
+  }
+  if (choice === "rejected") return;
+
+  const banner = document.createElement("div");
+  banner.style.cssText = "position:fixed;bottom:16px;left:16px;right:16px;z-index:99999;background:#151820;color:white;padding:20px;border:1px solid #444;border-radius:14px;font:14px Arial,sans-serif;";
+  banner.innerHTML = '<strong>Cookie preferences</strong><p>We use optional analytics cookies to understand website traffic and improve QREVIA Studio.</p><button id="acceptAnalytics" style="padding:10px;margin:5px;">Accept</button><button id="rejectAnalytics" style="padding:10px;margin:5px;">Reject</button>';
+  document.body.appendChild(banner);
+
+  document.getElementById("acceptAnalytics").onclick = function () {
+    localStorage.setItem("qrevia_analytics_consent", "accepted");
+    banner.remove();
+    enableAnalytics();
+  };
+
+  document.getElementById("rejectAnalytics").onclick = function () {
+    localStorage.setItem("qrevia_analytics_consent", "rejected");
+    banner.remove();
+  };
+});
+</script>
+
+  <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>QREVIA Studio — Creator Workspace</title>
 <style>
