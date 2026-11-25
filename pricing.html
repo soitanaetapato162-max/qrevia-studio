@@ -36,19 +36,32 @@ footer{padding:25px;font-size:13px}
 <footer>
 <a href="/legal.html">Terms · Privacy · Refund Policy</a>
 </footer>
-  <script>
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://slccglpnidvkpjjjwnit.supabase.co";
+const SUPABASE_KEY = "sb_publishable_E08YJQlfCan8kpSgLohwDg_A0zDJzOy";
+const db = supabase.createClient(SUPABASE_URL,SUPABASE_KEY); 
 async function startCheckout() {
   const button = document.getElementById("checkoutBtn");
   button.disabled = true;
   button.textContent = "Opening secure checkout...";
 
   try {
-    const response = await fetch("/.netlify/functions/paddle-checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({})
-    });
+const { data: { session }, error } = await db.auth.getSession();
 
+if (error || !session) {
+  window.location.href = "/login.html";
+  return;
+}
+
+const response = await fetch("/.netlify/functions/agentaos-checkout", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + session.access_token
+  },
+  body: JSON.stringify({})
+});
     const data = await response.json();
 
     if (!response.ok || !data.checkoutUrl) {
