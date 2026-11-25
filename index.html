@@ -15,6 +15,25 @@ document.addEventListener("DOMContentLoaded", function () {
     document.head.appendChild(tag);
   }
 
+  const settings = document.createElement("button");
+  settings.type = "button";
+  settings.textContent = "Cookie Settings";
+  settings.style.cssText = "position:fixed;bottom:8px;right:8px;z-index:99998;padding:8px 12px;background:#151820;color:white;border:1px solid #444;border-radius:8px;font-size:12px;";
+  settings.onclick = function () {
+    window["ga-disable-G-EVE1CE24HK"] = true;
+    localStorage.removeItem("qrevia_analytics_consent");
+    document.cookie.split(";").forEach(function(cookie) {
+      const name = cookie.split("=")[0].trim();
+      if (name === "_ga" || name.startsWith("_ga_")) {
+        document.cookie = name + "=; Max-Age=0; path=/";
+        document.cookie = name + "=; Max-Age=0; path=/; domain=qreviastudio.com";
+      }
+    });
+    window.location.reload();
+  };
+  document.body.appendChild(settings);
+
+
   const choice = localStorage.getItem("qrevia_analytics_consent");
   if (choice === "accepted") {
     enableAnalytics();
