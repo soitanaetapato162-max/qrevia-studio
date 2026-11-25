@@ -29,7 +29,7 @@ footer{padding:25px;font-size:13px}
 <p>AI image generation and editing</p>
 <p>AI-powered creative tools</p>
 <p>Cancel your subscription anytime</p>
-<button id="checkoutBtn" disabled>Subscribe Now — $12/month (Coming Soon)</button>
+<button id="checkoutBtn" disabled onclick="startCheckout()">Subscribe Now — $12/month (Coming Soon)</button>
 <p>Secure checkout coming soon</p>
 </div>
 </main>
@@ -59,7 +59,7 @@ async function startCheckout() {
   } catch (error) {
     alert("Checkout is not ready yet: " + error.message);
     button.disabled = false;
-    button.textContent = "Subscribe Now — $7/month";
+  button.textContent = "Subscribe Now — $12/month";
   }
 }
 </script>
