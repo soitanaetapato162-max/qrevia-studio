@@ -95,11 +95,23 @@ const imageBlob = await imageResponse.blob();
 const imageUrl = URL.createObjectURL(imageBlob);
 link.href = imageUrl;
 link.download = "qrevia-image.png";
-link.textContent = "Download Image";
+link.textContent = "Save / Download Photo";
 link.style.display = "block";
 link.style.marginTop = "16px";
+link.onclick = async (event) => {
+  const file = new File([imageBlob], "qrevia-image.png", {type: imageBlob.type});
+  if (navigator.canShare && navigator.canShare({files: [file]})) {
+    event.preventDefault();
+    try {
+      await navigator.share({files: [file]});
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        window.open(imageUrl, "_blank");
+      }
+    }
+  }
+};
 result.appendChild(link);
-
 status.textContent="Image generated successfully!";
 }catch(error){
 status.textContent=error.message||"Please try again.";
